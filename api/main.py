@@ -85,19 +85,19 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8081",  # ✅ Allow web frontend
-    "http://192.168.1.18:8081",  # ✅ Allow frontend via IP
-    "http://192.168.1.18:8000"  # ✅ Allow self-access
+    "http://192.168.1.2:8081",  # ✅ Allow frontend via IP
+    "http://192.168.1.2:8000"  # ✅ Allow self-access
 ]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-MODEL = tf.keras.models.load_model("../saved_models/1/banana.keras")
+MODEL = tf.keras.models.load_model("../saved_models/3/banana.keras")
 
 
 class_names = ["Banana Black Sigatoka Disease", "Banana Healthy Leaf", "Banana Panama Disease"]
@@ -118,24 +118,25 @@ def read_file_as_image(data) -> np.ndarray:
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    image = read_file_as_image(await file.read())
+    image_data = await file.read()
+    
+    # Save the received image for debugging
+    with open("received_image.jpg", "wb") as f:
+        f.write(image_data)
+
+    image = read_file_as_image(image_data)
     img_batch = np.expand_dims(image, axis=0)
 
     predictions = MODEL.predict(img_batch)
-    print("Raw predictions:", predictions)  # Debugging line
-
     predicted_class_index = np.argmax(predictions[0])
     predicted_class = class_names[predicted_class_index]
     confidence = np.max(predictions[0])
-    
-    # Print the class probabilities
-    for idx, class_name in enumerate(class_names):
-        print(f"{class_name}: {predictions[0][idx]:.4f}")
-    
+
     return {
         'class': predicted_class,
         'confidence': float(confidence)
     }
+
 
 
 if __name__ == "__main__":

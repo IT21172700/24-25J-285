@@ -35,13 +35,23 @@ export default function HomeScreen() {
       </TouchableOpacity>
 
       {/* Description Section */}
-      <View style={styles.descriptionContainer}>
-        <Text style={styles.descriptionTitle}>Description</Text>
-        <Text style={styles.descriptionText}>
-          Banana plants can suffer from various diseases such as **Black Sigatoka**, **Panama Disease**, 
-          and **Yellow Leaf Spot**. Early detection is crucial to prevent significant crop loss.
-        </Text>
-      </View>
+<View style={styles.descriptionContainer}>
+  <Text style={styles.descriptionTitle}>Description</Text>
+  <Text style={styles.descriptionText}>
+    Banana plants are susceptible to several devastating diseases, including **Black Sigatoka** 
+    and **Panama Disease**. These infections can severely impact crop yield and quality. 
+    Early detection and timely intervention using advanced AI-based solutions can help 
+    farmers mitigate losses and ensure healthier banana cultivation.
+  </Text>
+
+  <Text style={styles.descriptionTitle}>විස්තරය</Text>
+  <Text style={styles.descriptionText}>
+    කෙසෙල් ශාක "කළු සිගටෝකා",
+  "පැනමා රෝගය" ඇතුළු විනාශකාරී රෝග කිහිපයකට ගොදුරු වේ. මෙම ආසාදන බෝග අස්වැන්න සහ ගුණාත්මක භාවයට දැඩි ලෙස බලපෑ හැකිය. උසස් AI පාදක විසඳුම් භාවිතයෙන් කල්තියා හඳුනා ගැනීම සහ කාලෝචිත මැදිහත්වීම
+  ගොවීන්ට පාඩු අවම කර ගැනීමට සහ සෞඛ්‍ය සම්පන්න කෙසෙල් වගාව සහතික කිරීමට උපකාරී වේ.
+  </Text>
+</View>
+
     </View>
   );
 }
