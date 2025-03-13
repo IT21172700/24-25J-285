@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Ale
 import * as ImagePicker from 'expo-image-picker';
 
 
-const API_URL = "http://192.168.1.2:8000/predict"; // Change to your local API URL
+const API_URL = "http://192.168.8.176:8000/predict"; // Change to your local API URL
 
 export default function UploadScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

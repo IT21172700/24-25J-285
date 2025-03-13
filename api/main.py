@@ -85,8 +85,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8081",  # ✅ Allow web frontend
-    "http://192.168.1.2:8081",  # ✅ Allow frontend via IP
-    "http://192.168.1.2:8000"  # ✅ Allow self-access
+    "http://192.168.8.176:8081",  # ✅ Allow frontend via IP
+    "http://192.168.8.176:8000"  # ✅ Allow self-access
 ]
 
 app.add_middleware(
