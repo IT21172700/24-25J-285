@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
-
+import * as Speech from 'expo-speech';
 
 const API_URL = "http://192.168.8.174:8000/predict"; // Change to your local API URL
 
@@ -71,7 +71,18 @@ export default function UploadScreen() {
       setLoading(false);
     }
   };
-   
+   // Function for Sinhala Text-to-Speech
+  const speakSinhala = (textArray?: string[]) => {
+    if (textArray && textArray.length > 0) {
+      const fullText = textArray.join(". "); // Join array into a single sentence
+      Speech.stop();
+      Speech.speak(fullText, { language: 'si-LK' });
+
+    } else {
+      Alert.alert("No Sinhala Treatment Available", "There is no treatment information to read.");
+    }
+  };
+
 
   return (
     <ScrollView style={styles.container}>
@@ -107,6 +118,10 @@ export default function UploadScreen() {
           {prediction?.treatment?.sinhala?.map((step: string, index: number) => (
             <Text key={index} style={styles.treatmentText}>• {step}</Text>
           ))}
+        {/* ✅ Fix: Text-to-Speech Button for Sinhala */}
+        <TouchableOpacity style={styles.speakButton} onPress={() => speakSinhala(prediction?.treatment?.sinhala)}>
+            <Text style={styles.speakButtonText}>🔊 Listen to Sinhala Treatment</Text>
+          </TouchableOpacity>
         </View>
       )}
     </ScrollView>
@@ -190,5 +205,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#228B22',
     marginVertical: 15,
+  },
+  speakButton: {
+    backgroundColor: '#007AFF',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  speakButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
