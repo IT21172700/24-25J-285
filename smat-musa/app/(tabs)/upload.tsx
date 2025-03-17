@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState , useEffect} from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = "http://192.168.8.174:8000/predict"; // Change to your local API URL
 
 export default function UploadScreen() {
@@ -20,7 +20,27 @@ export default function UploadScreen() {
   | null
 >(null);
   //const [showTreatment, setShowTreatment] = useState(false);
+// ✅ Load last saved prediction when app starts
+useEffect(() => {
+  const fetchLastPrediction = async () => {
+    const lastPrediction = await loadPrediction();
+    if (lastPrediction) {
+      setPrediction(lastPrediction);
+    }
+  };
+  fetchLastPrediction();
+}, []);
 
+// ✅ Save the last prediction to AsyncStorage
+const savePrediction = async (prediction: any) => {
+  await AsyncStorage.setItem('lastPrediction', JSON.stringify(prediction));
+};
+
+// ✅ Load last prediction from AsyncStorage
+const loadPrediction = async () => {
+  const storedPrediction = await AsyncStorage.getItem('lastPrediction');
+  return storedPrediction ? JSON.parse(storedPrediction) : null;
+};
   // Function to pick an image from the gallery
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -64,6 +84,7 @@ export default function UploadScreen() {
 
       const result = await response.json();
       setPrediction(result);
+      savePrediction(result); // ✅ Save the prediction for offline use
     } catch (error) {
       Alert.alert("Prediction Error", "Something went wrong with the API.");
       console.error(error);
