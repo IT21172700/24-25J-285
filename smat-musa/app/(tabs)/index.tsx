@@ -38,8 +38,8 @@ export default function HomeScreen() {
 <View style={styles.descriptionContainer}>
   <Text style={styles.descriptionTitle}>Description</Text>
   <Text style={styles.descriptionText}>
-    Banana plants are susceptible to several devastating diseases, including **Black Sigatoka** 
-    and **Panama Disease**. These infections can severely impact crop yield and quality. 
+    Banana plants are susceptible to several devastating diseases, including "Black Sigatoka" 
+    and "Panama Disease". These infections can severely impact crop yield and quality. 
     Early detection and timely intervention using advanced AI-based solutions can help 
     farmers mitigate losses and ensure healthier banana cultivation.
   </Text>
