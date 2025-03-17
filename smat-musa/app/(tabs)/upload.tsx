@@ -43,15 +43,36 @@ const loadPrediction = async () => {
   const storedPrediction = await AsyncStorage.getItem('lastPrediction');
   return storedPrediction ? JSON.parse(storedPrediction) : null;
 };
-  // Function to pick an image from the gallery
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+  // Function to choose between Gallery or Camera
+  const selectImageSource = () => {
+    Alert.alert(
+      "Select Image Source",
+      "Choose an option",
+      [
+        { text: "Camera", onPress: () => pickImage("camera") },
+        { text: "Gallery", onPress: () => pickImage("gallery") },
+        { text: "Cancel", style: "cancel" }
+      ]
+    );
+  };
 
+  // Function to pick an image from Camera or Gallery
+  const pickImage = async (source: "camera" | "gallery") => {
+    let result;
+    if (source === "camera") {
+      result = await ImagePicker.launchCameraAsync({
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    } else {
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+    }
     if (!result.canceled) {
       setSelectedImage(result.assets[0].uri);
       setPrediction(null);
@@ -122,7 +143,8 @@ const openWhatsApp = (disease: string) => {
         <Image source={require('@/assets/images/banana-leaf.jpg')} style={styles.previewImage} />
       )}
 
-<TouchableOpacity style={styles.button} onPress={pickImage}>
+<TouchableOpacity style={styles.button} onPress={() => selectImageSource()}>
+
         <Text style={styles.buttonText}>📷 Select an Image</Text>
       </TouchableOpacity>
 
