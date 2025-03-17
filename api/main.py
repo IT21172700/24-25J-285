@@ -85,8 +85,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8081",  # ✅ Allow web frontend
-    "http://192.168.8.176:8081",  # ✅ Allow frontend via IP
-    "http://192.168.8.176:8000"  # ✅ Allow self-access
+    "http://192.168.8.174:8081",  # ✅ Allow frontend via IP
+    "http://192.168.8.174:8000"  # ✅ Allow self-access
 ]
 
 app.add_middleware(
@@ -113,7 +113,45 @@ def read_file_as_image(data) -> np.ndarray:
     image = np.array(Image.open(BytesIO(data)))
     return image
 
-
+# Disease treatment dictionary
+disease_treatments = {
+    "Banana Black Sigatoka Disease": {
+        "english": [
+            "1. Remove infected leaves and destroy them.",
+            "2. Apply fungicides like mancozeb or propiconazole.",
+            "3. Improve air circulation and reduce leaf wetness.",
+            "4. Use resistant banana varieties when possible."
+        ],
+        "sinhala": [
+            "1. ආසාදිත කොළ ඉවත් කර විනාශ කරන්න.",
+            "2. Mancozeb හෝ Propiconazole වැනි විෂබීජ නාශක යෙදීම.",
+            "3. වාතය හොඳින් ගලා යාමට සහ කොළ තෙතමනය අඩු කරන්න.",
+            "4. හැකි තරම් ප්‍රතිරෝධී කෙසෙල් වර්ග භාවිතා කරන්න."
+        ]
+    },
+    "Banana Panama Disease": {
+        "english": [
+            "1. Use disease-free planting materials.",
+            "2. Avoid moving infected plants to new areas.",
+            "3. Maintain proper drainage to prevent waterlogging.",
+            "4. Apply biological control methods where available."
+        ],
+        "sinhala": [
+            "1. රෝග රහිත පැල වගා කරන්න.",
+            "2. ආසාදිත පැල නව ප්‍රදේශවලට ගෙන යාම වළක්වන්න.",
+            "3. ජල ගැඹුර වැළැක්වීමට නිසි ජල නායාම ක්‍රමවේද පවත්වා ගන්න.",
+            "4. ඇති ස්ථාන වල ජීව විෂබීජ පාලනයේ ක්‍රම යොදන්න."
+        ]
+    },
+    "Banana Healthy Leaf": {
+        "english": [
+            "Your banana plant appears healthy! Maintain proper irrigation, fertilization, and pest control practices."
+        ],
+        "sinhala": [
+            "ඔබේ කෙසෙල් පැල සෞඛ්‍ය සම්පන්නය! නිතර පරීක්ෂා කර නිසි ජලසන්ධානය, පොහොර යෙදීම සහ කෘමීන් පාලනය කරගෙන යන්න."
+        ]
+    }
+}
 
 
 @app.post("/predict")
@@ -131,10 +169,12 @@ async def predict(file: UploadFile = File(...)):
     predicted_class_index = np.argmax(predictions[0])
     predicted_class = class_names[predicted_class_index]
     confidence = np.max(predictions[0])
-
+# Get treatment based on prediction
+    treatment = disease_treatments.get(predicted_class, {})
     return {
         'class': predicted_class,
-        'confidence': float(confidence)
+        'confidence': float(confidence),
+        "treatment": disease_treatments.get(predicted_class, {"english": ["No treatment available"], "sinhala": ["චිකිත්සා ලබා නොමැත"]})
     }
 
 
