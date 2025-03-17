@@ -2,6 +2,8 @@ import React, { useState , useEffect} from 'react';
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
+import { Linking } from 'react-native';
+
 import AsyncStorage from '@react-native-async-storage/async-storage';
 const API_URL = "http://192.168.8.174:8000/predict"; // Change to your local API URL
 
@@ -104,7 +106,12 @@ const loadPrediction = async () => {
     }
   };
 
-
+// Open WhatsApp with the disease information
+const openWhatsApp = (disease: string) => {
+  const phoneNumber = "+94771234567"; // Example agricultural officer
+  const message = `Hello, I detected ${disease} on my banana plant. What should I do?`;
+  Linking.openURL(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`);
+};
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.mainTitle}>🍌 Banana Leaf Disease Diagnosis</Text>
@@ -142,6 +149,10 @@ const loadPrediction = async () => {
         {/* ✅ Fix: Text-to-Speech Button for Sinhala */}
         <TouchableOpacity style={styles.speakButton} onPress={() => speakSinhala(prediction?.treatment?.sinhala)}>
             <Text style={styles.speakButtonText}>🔊 Listen to Sinhala Treatment</Text>
+          </TouchableOpacity>
+       {/* WhatsApp Contact Button */}
+       <TouchableOpacity style={styles.whatsappButton} onPress={() => openWhatsApp(prediction.class)}>
+            <Text style={styles.whatsappText}>📩 Contact an Expert</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -235,6 +246,23 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   speakButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  whatsappButton: {
+    backgroundColor: '#25D366',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  speakText: {
+    color: '#000',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  whatsappText: {
     color: '#fff',
     fontSize: 18,
     fontWeight: 'bold',
