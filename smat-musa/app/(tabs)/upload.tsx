@@ -14,6 +14,7 @@ export default function UploadScreen() {
   | {
       class: string;
       confidence: number;
+      gradcam_image?: string;
       treatment?: {
         english?: string[];
         sinhala?: string[];
@@ -161,8 +162,11 @@ const openWhatsApp = (disease: string) => {
           <Text style={styles.confidence}>Confidence: {(prediction.confidence * 100).toFixed(2)}%</Text>
 
           <Text style={styles.treatmentTitle}>🩺 Treatment Plan</Text>
+
           {prediction?.treatment?.english?.map((step: string, index: number) => (
             <Text key={index} style={styles.treatmentText}>• {step}</Text>
+
+            
           ))}
          <Text style={styles.treatmentTitle}>🩺 චිකිත්සා පියවර</Text>
           {prediction?.treatment?.sinhala?.map((step: string, index: number) => (
@@ -176,7 +180,23 @@ const openWhatsApp = (disease: string) => {
        <TouchableOpacity style={styles.whatsappButton} onPress={() => openWhatsApp(prediction.class)}>
             <Text style={styles.whatsappText}>📩 Contact an Expert</Text>
           </TouchableOpacity>
+
+           {/* Display Grad-CAM Heatmap */}
+           {prediction.gradcam_image && (
+           <Image 
+           source={{ uri: "http://192.168.8.174:8000/gradcam/gradcam_result.jpg" }} 
+           style={{ width: 300, height: 300 }} 
+           onError={(e) => console.log("Error loading image:", e.nativeEvent)}
+         />
+         
+         
+         
+         
+         
+
+          )}
         </View>
+        
       )}
     </ScrollView>
   );
@@ -188,6 +208,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#F9F9F9',
     padding: 20,
   },
+  heatmapImage: {
+    width: '100%',
+    height: 250,
+    borderRadius: 10,
+    marginTop: 12,
+  },
+  
   previewImage: {
     width: '100%',
     height: 240,
