@@ -89,8 +89,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8081",  # ✅ Allow web frontend
-    "http://192.168.8.174:8081",  # ✅ Allow frontend via IP
-    "http://192.168.8.174:8000"  # ✅ Allow self-access
+    "http://192.168.43.229:8081",  # ✅ Allow frontend via IP
+    "http://192.168.43.229:8000"  # ✅ Allow self-access
 ]
 
 app.add_middleware(
@@ -251,9 +251,14 @@ def apply_heatmap(image, heatmap, alpha=0.4):
 async def predict(file: UploadFile = File(...)):
     image_data = await file.read()
     
-    # Save the received image for debugging
-    with open("received_image.jpg", "wb") as f:
+    # Debugging: Save received image with a timestamp
+    import time
+    timestamp = int(time.time())  # Unique timestamp
+    received_image_filename = f"received_image_{timestamp}.jpg"
+    with open(received_image_filename, "wb") as f:
         f.write(image_data)
+
+    print(f"✅ New Image Received: {received_image_filename}")
 
     image = read_file_as_image(image_data)
     img_batch = np.expand_dims(image, axis=0)
@@ -264,7 +269,7 @@ async def predict(file: UploadFile = File(...)):
     confidence = np.max(predictions[0])
 # Get treatment based on prediction
     treatment = disease_treatments.get(predicted_class, {})
-
+    print(f"🔍 Prediction: {predicted_class} (Confidence: {confidence:.2f})")
     # Convert input image back to uint8 (0-255) for heatmap overlay
     input_image_uint8 = (image * 255).astype(np.uint8)
 
@@ -275,14 +280,17 @@ async def predict(file: UploadFile = File(...)):
     gradcam_image = apply_heatmap(input_image_uint8, heatmap)
 
     # Save Grad-CAM image
-    gradcam_filename = "gradcam_result.jpg"
+    import time
+    timestamp = int(time.time())  # Unique timestamp
+    gradcam_filename = f"gradcam_result_{timestamp}.jpg"
     cv2.imwrite(gradcam_filename, cv2.cvtColor(gradcam_image, cv2.COLOR_RGB2BGR))
 
 
+    print(f"✅ New Grad-CAM Image Saved: {gradcam_filename}")
     return {
         'class': predicted_class,
         'confidence': float(confidence),
-        "gradcam_image": gradcam_filename,
+        "gradcam_image": f"http://192.168.43.229:8000/gradcam/{gradcam_filename}",
         "treatment": disease_treatments.get(predicted_class, {"english": ["No treatment available"], "sinhala": ["චිකිත්සා ලබා නොමැත"]})
     }
 

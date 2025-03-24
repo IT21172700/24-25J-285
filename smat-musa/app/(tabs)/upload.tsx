@@ -3,9 +3,9 @@ import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Ale
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
 import { Linking } from 'react-native';
-
+import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const API_URL = "http://192.168.8.174:8000/predict"; // Change to your local API URL
+const API_URL = "http://192.168.43.229:8000/predict"; // Change to your local API URL
 
 export default function UploadScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -183,11 +183,12 @@ const openWhatsApp = (disease: string) => {
 
            {/* Display Grad-CAM Heatmap */}
            {prediction.gradcam_image && (
-           <Image 
-           source={{ uri: "http://192.168.8.174:8000/gradcam/gradcam_result.jpg" }} 
-           style={{ width: 300, height: 300 }} 
-           onError={(e) => console.log("Error loading image:", e.nativeEvent)}
-         />
+          <Image 
+          source={{ uri: prediction.gradcam_image + '?t=' + new Date().getTime() }} 
+          style={{ width: 300, height: 300 }} 
+          onError={(e) => console.log("Error loading image:", e.nativeEvent)}
+        />
+        
          
          
          
