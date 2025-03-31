@@ -1,15 +1,20 @@
 import React, { useState , useEffect} from 'react';
+
+
 import { View, Text, Image, TouchableOpacity, ActivityIndicator, StyleSheet, Alert, ScrollView } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import * as Speech from 'expo-speech';
 import { Linking } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-const API_URL = "http://192.168.43.229:8000/predict"; // Change to your local API URL
+import { Modal } from 'react-native';
+
+const API_URL = "http://192.168.1.10:8000/predict"; // Change to your local API URL
 
 export default function UploadScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
   const [prediction, setPrediction] = useState<
   | {
       class: string;
@@ -161,61 +166,127 @@ const openWhatsApp = (disease: string) => {
           <Text style={styles.diseaseName}>{prediction.class}</Text>
           <Text style={styles.confidence}>Confidence: {(prediction.confidence * 100).toFixed(2)}%</Text>
 
-          <Text style={styles.treatmentTitle}>🩺 Treatment Plan</Text>
+          <Text style={styles.treatmentTitle}> Treatment Plan</Text>
 
           {prediction?.treatment?.english?.map((step: string, index: number) => (
             <Text key={index} style={styles.treatmentText}>• {step}</Text>
 
             
           ))}
-         <Text style={styles.treatmentTitle}>🩺 චිකිත්සා පියවර</Text>
+         <Text style={styles.treatmentTitle}> චිකිත්සා පියවර</Text>
           {prediction?.treatment?.sinhala?.map((step: string, index: number) => (
             <Text key={index} style={styles.treatmentText}>• {step}</Text>
           ))}
-        {/* ✅ Fix: Text-to-Speech Button for Sinhala */}
-        <TouchableOpacity style={styles.speakButton} onPress={() => speakSinhala(prediction?.treatment?.sinhala)}>
-            <Text style={styles.speakButtonText}>🔊 Listen to Sinhala Treatment</Text>
-          </TouchableOpacity>
-       {/* WhatsApp Contact Button */}
-       <TouchableOpacity style={styles.whatsappButton} onPress={() => openWhatsApp(prediction.class)}>
-            <Text style={styles.whatsappText}>📩 Contact an Expert</Text>
+        {/* Stylish Buttons */}
+        <TouchableOpacity style={styles.outlineButtonBlue} onPress={() => speakSinhala(prediction?.treatment?.sinhala)}>
+            <View style={styles.buttonContent}>
+              <Ionicons name="volume-high-outline" size={22} color="#007AFF" style={styles.icon} />
+              <Text style={styles.outlineTextBlue}>Listen to Sinhala Treatment</Text>
+            </View>
           </TouchableOpacity>
 
-           {/* Display Grad-CAM Heatmap */}
-           {prediction.gradcam_image && (
-          <Image 
-          source={{ uri: prediction.gradcam_image + '?t=' + new Date().getTime() }} 
-          style={{ width: 300, height: 300 }} 
-          onError={(e) => console.log("Error loading image:", e.nativeEvent)}
-        />
-        
-         
-         
-         
-         
-         
+          <TouchableOpacity style={styles.outlineButtonGreen} onPress={() => openWhatsApp(prediction.class)}>
+            <View style={styles.buttonContent}>
+              <Ionicons name="chatbubble-ellipses-outline" size={22} color="#28A745" style={styles.icon} />
+              <Text style={styles.outlineTextGreen}>Contact an Expert</Text>
+            </View>
+          </TouchableOpacity>
 
+          {prediction.gradcam_image && (
+            <TouchableOpacity style={styles.outlineButtonRed} onPress={() => setModalVisible(true)}>
+              <View style={styles.buttonContent}>
+                <Ionicons name="map-outline" size={22} color="#D32F2F" style={styles.icon} />
+                <Text style={styles.outlineTextRed}>View Leaf Disease Heatmap</Text>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
-        
       )}
+
+      <Modal visible={modalVisible} transparent animationType="slide">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            <Text style={styles.heatmapTitle}>🌡️ Leaf Disease Heatmap</Text>
+            <Text style={styles.heatmapDescription}>රෝගය ව්‍යාප්ත වී ඇති කොටස් මෙහි රතු පාටින් පෙන්වයි.</Text>
+            <TouchableOpacity onPress={() => Speech.speak("රෝගය ව්‍යාප්ත වී ඇති කොටස් මෙහි රතු පාටින් පෙන්වයි", { language: 'si-LK' })}>
+              <Text style={styles.speakButtonText}>🔊 සිංහලෙන් ඇසෙන්න</Text>
+            </TouchableOpacity>
+            <Image source={{ uri: prediction?.gradcam_image + '?t=' + new Date().getTime() }} style={styles.heatmapImage} />
+            <TouchableOpacity style={styles.closeButton} onPress={() => setModalVisible(false)}>
+              <Text style={styles.buttonText}>❌ Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 }
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9F9F9',
     padding: 20,
   },
+ 
+  heatmapButton: {
+    backgroundColor: '#D32F2F',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginTop: 14,
+  },
+  heatmapButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  buttonContent: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingVertical: 12 },
+  icon: { marginRight: 8 },
+  outlineButtonBlue: { borderWidth: 1.5, borderColor: '#007AFF', borderRadius: 10, marginVertical: 6 },
+  outlineButtonGreen: { borderWidth: 1.5, borderColor: '#28A745', borderRadius: 10, marginVertical: 6 },
+  outlineButtonRed: { borderWidth: 1.5, borderColor: '#D32F2F', borderRadius: 10, marginVertical: 6 },
+  outlineTextBlue: { color: '#007AFF', fontSize: 16, fontWeight: '600' },
+  outlineTextGreen: { color: '#28A745', fontSize: 16, fontWeight: '600' },
+  outlineTextRed: { color: '#D32F2F', fontSize: 16, fontWeight: '600' },
+  speakButtonText: { color: '#007AFF', fontSize: 18, fontWeight: 'bold' },
+  modalContent: {
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 16,
+    alignItems: 'center',
+  },
+  heatmapTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#D32F2F',
+    marginBottom: 8,
+  },
+  heatmapDescription: {
+    fontSize: 14,
+    color: '#333',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
   heatmapImage: {
     width: '100%',
-    height: 250,
+    height: 260,
     borderRadius: 10,
-    marginTop: 12,
+    marginTop: 10,
   },
-  
+  closeButton: {
+    backgroundColor: '#888',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 16,
+    width: '100%',
+  },
   previewImage: {
     width: '100%',
     height: 240,
@@ -295,11 +366,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 10,
   },
-  speakButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+ 
   whatsappButton: {
     backgroundColor: '#25D366',
     paddingVertical: 12,
