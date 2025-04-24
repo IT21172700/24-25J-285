@@ -9,7 +9,7 @@ import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Modal } from 'react-native';
 
-const API_URL = "http://192.168.1.10:8000/predict"; // Change to your local API URL
+const API_URL = "http://192.168.8.174:8000/predict"; // Change to your local API URL
 
 export default function UploadScreen() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);

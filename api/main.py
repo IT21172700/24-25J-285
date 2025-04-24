@@ -89,8 +89,8 @@ origins = [
     "http://localhost",
     "http://localhost:3000",
     "http://localhost:8081",  # ✅ Allow web frontend
-    "http://192.168.1.10:8081",  # ✅ Allow frontend via IP
-    "http://192.168.1.10:8000"  # ✅ Allow self-access
+    "http://192.168.8.174:8081",  # ✅ Allow frontend via IP
+    "http://192.168.8.174:8000"  # ✅ Allow self-access
 ]
 
 app.add_middleware(
@@ -290,7 +290,7 @@ async def predict(file: UploadFile = File(...)):
     return {
         'class': predicted_class,
         'confidence': float(confidence),
-        "gradcam_image": f"http://192.168.1.10:8000/gradcam/{gradcam_filename}",
+        "gradcam_image": f"http://192.168.8.174:8000/gradcam/{gradcam_filename}",
         "treatment": disease_treatments.get(predicted_class, {"english": ["No treatment available"], "sinhala": ["චිකිත්සා ලබා නොමැත"]})
     }
 
